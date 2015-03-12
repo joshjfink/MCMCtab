@@ -4,8 +4,8 @@
   check_packages(c("rstan","rjags", "R2jags", "xtable", "foreign", "data.table", "parallel", "dplyr", "epicalc","gmodels", "foreign", "stringr", "knitr"))
   detachAllData(); rm(list=ls())
 
-### Load in 2006 data
-  load("SF_Environment_Moving.RData")
+### Load in 2006 data with 25 countries
+  cdata <- read.csv( "Data/06data_25cntries.csv" , header = T)
 
 ### Subset Variables for models
   c.data <- cdata[,c("dspendlaw", "cntry", "foreignpct", "migpct", "police", "homicide", "inczscore", "age", "agesq", "female", "nevermar", "divorced", "widow", "kidshh", "rural", "suburb", "lesshs", "univ", "ptemp", "unemp", "nolabor", "selfemp", "pubemp", "protestant", "catholic", "otherrel", "relreligion")]
@@ -53,12 +53,11 @@
   }'
 
 ### Random Effects Logistic Regression using the Hamiltonian Monte Carlo (HMC) algorithm called the "No-U Turn Sampler (NUTS)" of Hoffman and Gelman (2011) for 2006 w/25 countries including foreignpct, migpct, homicide, and police & individual controls
-
   # Translate model code to C++
     stk_mig_hp_06 <- stan(model_code=mod_code, model_name="Stock and MigPct w/Police and Homicide 2006", data=polimm_dat, chains = 0)
 
   # Run two HMC chains in parallel for 1000 iterations # WARNING runs for >10min
-    CL = makeCluster(2, outfile = 'parallel.log')
+    CL = makeCluster(2, outfile = 'Local_Only/parallel.log')
     clusterExport(cl = CL, c("polimm_dat", "stk_mig_hp_06")) 
     sflist <- mclapply(1:2, mc.cores = 2, function(i)  stan(fit = stk_mig_hp_06, data=polimm_dat, chains=1, iter=1000,chain_id = i))
     stopCluster(CL)
@@ -67,10 +66,10 @@
     fit <- sflist2stanfit(sflist)
 
   # Save Model 
-    save(fit, file= "stk_mig_ph06.dat")
+    save(fit, file= "Model_Results/stk_mig_ph06.dat")
 
   # Create diagnostic plots 
     print(fit)
-    pdf("stk_mig_ph06_MCMC.pdf")
+    pdf("Plots/stk_mig_ph06_MCMC.pdf")
     t <- rstan::traceplot(fit)
     dev.off()
