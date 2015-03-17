@@ -12,64 +12,18 @@
 # "police", "homicide", i,
   # for (i in imm_vars){
 
+n= nrow(cdata)
+sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/15, replace=F)) %>%
+  dplyr::select(dspendlaw, cntryyr,cntry, yr2006, foreignpct, age ,agesq,female,ptemp,unemp) %>%
+  dplyr::select(dspendlaw, cntryyr,cntry, yr2006, foreignpct, age ,agesq,female,ptemp,unemp) %>%
+  mutate(region = as.numeric(as.character(factor(cntry, labels=seq(1,length(unique(cntry)),1))))) %>% 
+  mutate(state = ifelse(yr2006==1, region+16, region))  %>% 
+  mutate(y = dspendlaw)
+
 
 dataList.2 <- list(dplyr::select(sampdat, y, region, state, female, ptemp, unemp, foreignpct)
   , n_age=unique(sampdat$age), n_state=unique(sampdat$state), n_region=unique(sampdat$region), N=nrow(sampdat))
 
 
-#### Break here 
+# Break here (use end of R_Stan_Models.R to run in parallel)
 
-### Code the Model
-  mod_code <- '
-  data {
-      int N; // number of obs 
-      int M; // number of countries
-      int K; // number of predictors
-      
-      int y[N]; // law enforcement spending
-      row_vector[K] x[N]; // predictors
-      int g[N];    // map respondents to countries
-  }
-  parameters {
-      real alpha; // the constant
-      real a[M]; // country specific random effects
-      vector[K] beta; // coefficient predictors
-      real<lower=0> sigma[M];  // standard deviation of the random effects 
-  }
-  transformed parameters {
-    vector[n] y_hat;
-    y[n] ~ 
-  }
-  model {
-    alpha ~ normal(0,100);
-    sigma ~ cauchy(0,0.25);
-    a ~ normal(0,sigma);
-    beta ~ normal(0,100);
-    y ~ bernoulli_logit(y_hat);
-  }
-      y[n] ~ bernoulli(inv_logit( alpha + a[g[n]] + x[n]*beta));
-    }
-  }'
-
-### Random Effects Logistic Regression using the Hamiltonian Monte Carlo (HMC) algorithm called the "No-U Turn Sampler (NUTS)" of Hoffman and Gelman (2011) for 2006 w/25 countries including foreignpct, migpct, homicide, and police & individual controls
-  # Translate model code to C++
-    stk_mig_hp_06 <- stan(model_code=mod_code, model_name="Stock and MigPct w/Police and Homicide 2006", data=polimm_dat, chains = 0)
-
-  # Run two HMC chains in parallel for 1000 iterations # WARNING runs for >10min
-    # rng_seed <- c(34, 154)
-    CL = makeCluster(2, outfile = 'Local_Only/parallel.log')
-    clusterExport(cl = CL, c("polimm_dat", "stk_mig_hp_06")) 
-    sflist <- mclapply(1:2, mc.cores = 2, function(i)  stan(fit = stk_mig_hp_06, data=polimm_dat, chains=1, seed = 35, iter=500,chain_id = i))
-    stopCluster(CL)
-
-  # Merge the two HMC chains 
-    fit <- sflist2stanfit(sflist)
-
-  # Save Model 
-    save(fit, file= "Model_Results/stk_mig_ph06.dat")
-
-  # Create diagnostic plots 
-    print(fit)
-    pdf("Plots/stk_mig_ph06_MCMC.pdf")
-    t <- rstan::traceplot(fit)
-    dev.off()
