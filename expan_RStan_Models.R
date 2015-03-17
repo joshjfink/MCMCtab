@@ -1,7 +1,7 @@
 ### Set Working Direct, Clear Environment, and Load Packages
   setwd("/Universe/GitHub/MCMCtab")
   source("check_packages.R")
-  check_packages(c("rstan","rjags", "R2jags", "xtable", "foreign", "data.table", "parallel", "dplyr", "epicalc","gmodels", "foreign", "stringr", "knitr"))
+  check_packages(c("rstan", "xtable", "foreign", "data.table", "parallel", "dplyr", "epicalc","gmodels", "foreign", "stringr", "knitr"))
   detachAllData( ); rm(list=ls())
 
 ### Load in 2006 data with 25 countries
@@ -11,44 +11,13 @@
   # imm_vars <- c("foreignpct", "migpct", "foreigndif", "dforeignpctnew")
 # "police", "homicide", i,
   # for (i in imm_vars){
-c.data <- cdata[,c("dspendlaw", "cntry",  "yr2006", "foreignpct", "age" ,"agesq","female","ptemp","unemp")]
 
 
-# "migpct", "foreigndif", "dforeignpctnew"
-### Attach data
-  attach(c.data)
-
-### Build Matrix for Predictors
-  x   <- data.frame(cbind(c.data[,4:ncol(c.data)]))
-### Number of countries (level 2 units)
-  M  <- length(unique(cntry))
-### Number of predictors
-  K     <- dim(x)[2]
-### Recode Country Values as sequential (still need to equate with no labels)
-  levels(cntry) <- seq(1,length(unique(cntry)),1)
-  cntry <- as.numeric(as.character(cntry))
-
-# Sample subset of data to test models
-n= length(dspendlaw)
-subset <- sample (n, n/10)
-n <- length (subset)
-y=dspendlaw
-X=x
-state=cntry
-y <- y[subset]
-X <- X[subset,]
-state <- state[subset]
+dataList.2 <- list(dplyr::select(sampdat, y, region, state, female, ptemp, unemp, foreignpct)
+  , n_age=unique(sampdat$age), n_state=unique(sampdat$state), n_region=unique(sampdat$region), N=nrow(sampdat))
 
 
-#  #  #  #  #  #  #  #  #  #  #  
-#  break here, see gelman 2007 book ch.19 and https://github.com/stan-dev/example-models/blob/master/ARM/Ch.19/19.4_RedundantParameters%26IntentionallyNonidentifiableModels.R#L136
-
-### Prepare data for Stan
-  polimm_dat  <- list(N= length(dspendlaw), M=M, K=K, y=dspendlaw, x=x,g=cntry)
-
-
-
-
+#### Break here 
 
 ### Code the Model
   mod_code <- '
