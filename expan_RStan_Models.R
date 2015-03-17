@@ -12,6 +12,7 @@
 # "police", "homicide", i,
   # for (i in imm_vars){
 
+# Build sample data (also recode vars for stan)
 n= nrow(cdata)
 sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/15, replace=F)) %>%
   dplyr::select(dspendlaw, cntryyr,cntry, yr2006, foreignpct, age ,agesq,female,ptemp,unemp) %>%
@@ -20,7 +21,7 @@ sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/
   mutate(state = ifelse(yr2006==1, region+16, region))  %>% 
   mutate(y = dspendlaw)
 
-
+# Generate stan data 
 dataList.2 <- list(dplyr::select(sampdat, y, region, state, female, ptemp, unemp, foreignpct)
   , n_age=unique(sampdat$age), n_state=unique(sampdat$state), n_region=unique(sampdat$region), N=nrow(sampdat))
 

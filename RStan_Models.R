@@ -2,13 +2,16 @@
   setwd("/Universe/GitHub/MCMCtab")
   source("check_packages.R")
   check_packages(c("rstan","rjags", "R2jags", "xtable", "foreign", "data.table", "parallel", "dplyr", "epicalc","gmodels", "foreign", "stringr", "knitr"))
-  detachAllData(); rm(list=ls())
+  detachAllData( ); rm(list=ls())
 
 ### Load in 2006 data with 25 countries
   cdata <- read.csv( "Data/06data_25cntries.csv" , header = T)
 
 ### Subset Variables for models
-  c.data <- cdata[,c("dspendlaw", "cntry", "foreignpct", "migpct", "police", "homicide", "inczscore", "age", "agesq", "female", "nevermar", "divorced", "widow", "kidshh", "rural", "suburb", "lesshs", "univ", "ptemp", "unemp", "nolabor", "selfemp", "pubemp", "protestant", "catholic", "otherrel", "relreligion")]
+  imm_vars <- c("foreignpct", "migpct", "foreigndif", "dforeignpctnew")
+
+  for (i in imm_vars){
+    c.data <- cdata[,c("dspendlaw", "cntry",  "police", "homicide", i, "inczscore", "age", "agesq", "female", "nevermar", "divorced", "widow", "kidshh", "rural", "suburb", "lesshs", "univ", "ptemp", "unemp", "nolabor", "selfemp", "pubemp", "protestant", "catholic", "otherrel", "relreligion","foreignpct", "migpct", "foreigndif", "dforeignpctnew" )]
 
 ### Attach data
   attach(c.data)
