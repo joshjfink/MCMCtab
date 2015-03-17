@@ -7,11 +7,6 @@
 ### Load in 2006 data with 25 countries
   cdata <- read.csv( "Data/fedata.csv" , header = T)
 
-### Subset Variables for models
-  # imm_vars <- c("foreignpct", "migpct", "foreigndif", "dforeignpctnew")
-# "police", "homicide", i,
-  # for (i in imm_vars){
-
 # Build sample data (also recode vars for stan)
 n= nrow(cdata)
 sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/15, replace=F)) %>%
@@ -19,105 +14,46 @@ sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/
   dplyr::select(dspendlaw, cntryyr,cntry, yr2006, foreignpct, age ,agesq,female,ptemp,unemp) %>%
   mutate(region = as.numeric(as.character(factor(cntry, labels=seq(1,length(unique(cntry)),1))))) %>% 
   mutate(state = ifelse(yr2006==1, region+16, region))  %>% 
-  mutate(y = dspendlaw)
+  mutate(y = dspendlaw) %>% 
+  arrange(state)
+
+# Foreign Percent Country-year summaries
+foreignpct_l2 <- dplyr::summarise(group_by(sampdat, state), mean(foreignpct))[,2]
+
+##### Number of binary predictors (+1)! (Manually code)
+D = integer(3+ 1)
 
 # Generate stan data 
-dataList.2 <- list(dplyr::select(sampdat, y, region, state, female, ptemp, unemp, foreignpct, age, agesq) , n_age=max(sampdat$age), n_state=max(sampdat$state), n_region=max(sampdat$region), N=nrow(sampdat))
+# stock_mod1 <-  
+# attach(dplyr::select(sampdat, y, female, ptemp, unemp, age, as.numeric(agesq)))
 
+attach(sampdat)
+stock_dat1 <-  list(y=y, female=female, ptemp=ptemp, unemp=unemp, age=age, agesq=as.numeric(agesq),
+  n_age=as.integer(max(sampdat$age)), 
+  n_state=as.integer(max(sampdat$state)), 
+  n_region=as.integer(max(sampdat$region)), 
+  N=as.integer(nrow(sampdat)), 
+  foreignpct=as.numeric(unlist(foreignpct_l2)), 
+  region=as.integer(c(unique(sampdat$region))),
+  state= as.integer(unique(sampdat$state)), D=D)
+
+str(stock_dat1)
+
+# Left off here!
+
+
+
+stock_dat1 <- list(dataList.1, D=D)
+str(stock_dat1)
+
+# Will uncomment when model is finished
+  # Expansion_stock.sf1 <- stan(file='Expansion_stock.stan',
+                                  # data=stock_dat1, iter=1000, chains=4)
+
+## Subset Variables for models
+  # imm_vars <- c("foreignpct", "migpct", "foreigndif", "dforeignpctnew") 
+  # for (i in imm_vars){
 
 ### Code the Model
-  # mod_code <- '
-data {
-  int<lower=0> N;  
-  int<lower=0> n_age;
-  int<lower=0> n_state;
-  int<lower=0> n_region;
-  int<lower=1,upper=n_age> age[N]; # Categorical-ish vars
-  vector<lower=0,upper=1>[N]female; # Binary predictors
-  vector<lower=0,upper=1>[N]ptemp;
-  vector<lower=0,upper=1>[N]unemp;
+  # See STAN model Expansion_stock.stan
 
-# Break here 
-
-
-  int<lower=1,upper=n_region> region[n_state];
-  int<lower=1,upper=n_state> state[N];
-  vector[n_state] v_prev;
-  int<lower=0,upper=1> y[N];
-} 
-parameters {
-  real b_0;
-  real b_black;
-  real b_female;
-  real b_female_black;
-  real b_v_prev_raw;
-  vector[4] beta;
-  vector[n_age_edu] b_age_edu;
-  vector[n_age] b_age_raw;
-  vector[n_edu] b_edu_raw;
-  vector[n_region] b_region_raw;
-  vector[n_state] b_state_raw;
-  real mu;
-  real mu_age_edu;
-  real<lower=0> sigma_age_raw;
-  real<lower=0> sigma_edu_raw;
-  real<lower=0> sigma_region_raw;
-  real<lower=0> sigma_state_raw;
-  real<lower=0> sigma_age_edu_raw;
-  real<lower=0> xi_age;
-  real<lower=0> xi_edu;
-  real<lower=0> xi_age_edu;
-  real<lower=0> xi_state;
-} 
-transformed parameters {
-  vector[N] Xbeta;
-  vector[n_age] b_age;
-  vector[n_age_edu] b_age_edu_adj;
-  vector[n_edu] b_edu;
-  vector[n_region] b_region;
-  vector[n_state] b_state;
-  vector[n_state] b_state_hat;
-  real mu_adj;
-  real<lower=0> sigma_age;
-  real<lower=0> sigma_edu;
-  real<lower=0> sigma_age_edu;
-  real<lower=0> sigma_state;
-  real<lower=0> sigma_region;
-
-  b_age <- xi_age * (b_age_raw - mean(b_age_raw));
-  b_edu <- xi_edu * (b_edu_raw - mean(b_edu_raw));
-  b_age_edu_adj <- b_age_edu - mean(b_age_edu);
-  b_region <- xi_state * b_region_raw;
-  b_state <- xi_state * (b_state_raw - mean(b_state_raw));
-  mu_adj <- beta[1] + mean(b_age) + mean(b_edu) + mean(b_age_edu) +
-     mean(b_state);
-
-  sigma_age <- xi_age*sigma_age_raw;
-  sigma_edu <- xi_edu*sigma_edu_raw;
-  sigma_age_edu <- xi_age_edu*sigma_age_edu_raw;
-  sigma_state <- xi_state*sigma_state_raw;
-  sigma_region <- xi_state*sigma_region_raw;     # not "xi_region"
-
-  for (i in 1:N)
-    Xbeta[i] <- beta[1] + beta[2]*female[i] + beta[3]*black[i] +
-      beta[4]*female[i]*black[i] +
-      b_age[age[i]] + b_edu[edu[i]] + b_age_edu[age_edu[i]] +
-      b_state[state[i]];
-  for (j in 1:n_state)
-    b_state_hat[j] <- b_region_raw[region[j]] + b_v_prev_raw*v_prev[j];
-}
-model {
-  mu ~ normal (0, 100);
-  mu_age_edu ~ normal(0, 1);
-
-  b_age_raw ~ normal(0, sigma_age_raw);
-  b_edu_raw ~ normal(0, sigma_edu_raw);
-  b_age_edu ~ normal(100 * mu_age_edu,sigma_age_edu);
-  b_state_raw ~ normal(b_state_hat, sigma_state_raw);
-  beta ~ normal(0, 100);
-
-  b_v_prev_raw ~ normal(0, 100);
-  b_region_raw ~ normal(0, sigma_region_raw);
-
-  y ~ bernoulli_logit(Xbeta);
-}

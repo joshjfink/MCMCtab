@@ -1,67 +1,3 @@
-library(rstan)
-library(ggplot2)
-
-#############################################################################################
-## Read the data
-# Data are at http://www.stat.columbia.edu/~gelman/arm/examples/pilots
-
-# The R codes & data files should be saved in the same directory for
-# the source command to work
-
-## Read the pilots data & define variables
-# Data are at http://www.stat.columbia.edu/~gelman/arm/examples/pilots
-
-pilots <- read.table ("pilots.dat", header=TRUE)
-attach (pilots)
-group.names <- as.vector(unique(group))
-scenario.names <- as.vector(unique(scenario))
-n.group <- length(group.names)
-n.scenario <- length(scenario.names)
-successes <- NULL
-failures <- NULL
-group.id <- NULL
-scenario.id <- NULL
-for (j in 1:n.group){
-  for (k in 1:n.scenario){
-    ok <- group==group.names[j] & scenario==scenario.names[k]    
-    successes <- c (successes, sum(recovered[ok]==1,na.rm=T))
-    failures <- c (failures, sum(recovered[ok]==0,na.rm=T))
-    group.id <- c (group.id, j)
-    scenario.id <- c (scenario.id, k)
-  }
-}
-
-y <- successes/(successes+failures)
-y.mat <- matrix (y, n.scenario, n.group)
-sort.group <- order(apply(y.mat,2,mean))
-sort.scenario <- order(apply(y.mat,1,mean))
-
-group.id.new <- sort.group[group.id]
-scenario.id.new <- sort.scenario[scenario.id]
-y.mat.new <- y.mat[sort.scenario,sort.group]
-
-scenario.abbr <- c("Nagoya", "B'ham", "Detroit", "Ptsbgh", "Roseln", "Chrlt", "Shemya", "Toledo")
-
-## Define variables
-treatment <- group.id
-airport <- scenario.id
-
-## Fit the 2-model using Bugs
-n.treatment <- max(treatment)
-n.airport <- max(airport)
-n <- length(y)
-
-## Model fit
-
-dataList.2 <- list(N=n,y=y,n_airport=n.airport,
-                   n_treatment=n.treatment,airport=airport,
-                   treatment=treatment)
-pilots_expansion.sf1 <- stan(file='pilots_expansion.stan', data=dataList.2,
-                             iter=1000, chains=4)
-print(pilots_expansion.sf1,pars = c("g","d", "sigma_y", "lp__"))
-
-## Multilevel logistic regression
-## radon model
 polls.subset <- read.table ("polls.subset.dat")
 attach(polls.subset)
 
@@ -70,7 +6,7 @@ attach(polls.subset)
  #
  # Regions:  1=northeast, 2=south, 3=north central, 4=west, 5=d.c.
  # We have to insert d.c. (it is the 9th "state" in alphabetical order)
-
+setwd("/Universe/GitHub/MCMCtab/Key_Model_References/Gelman_Ch19(ParamExpansion)")
 data (state)                  # "state" is an R data file
 state.abbr <- c (state.abb[1:8], "DC", state.abb[9:50])
 dc <- 9
@@ -107,10 +43,11 @@ dataList.2 <- list(N=n, n_age=n.age,n_edu=n.edu,n_state=n.state,
                    y=y,female=female.ok,black=black.ok,
                    age=age.ok,edu=edu.ok, state=state.ok,region=region,
                    v_prev=v.prev,age_edu=age.edu.ok)
+
+str(dataList.2)
 election88_expansion.sf1 <- stan(file='election88_expansion.stan',
                                  data=dataList.2, iter=1000, chains=4)
 print(election88_expansion.sf1, pars = c("beta","b_age", "b_edu","b_state","b_region","b_age_edu", "lp__"))
 
 
 ## item response model -- FIXME: DATA??
-
