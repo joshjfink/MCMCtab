@@ -12,7 +12,7 @@ data {
   vector<lower=0,upper=1>[N] female;
   int<lower=1,upper=n_region> region[n_state];
   int<lower=1,upper=n_state> state[N];
-  vector[n_state] v_prev;
+  vector[n_state] foreignpct;
   int<lower=0,upper=1> y[N];
 } 
 parameters {
@@ -20,7 +20,7 @@ parameters {
   real b_black;
   real b_female;
   real b_female_black;
-  real b_v_prev_raw;
+  real b_foreignpct_raw;
   vector[4] beta;
   vector[n_age_edu] b_age_edu;
   vector[n_age] b_age_raw;
@@ -74,7 +74,7 @@ transformed parameters {
       b_age[age[i]] + b_edu[edu[i]] + b_age_edu[age_edu[i]] +
       b_state[state[i]];
   for (j in 1:n_state)
-    b_state_hat[j] <- b_region_raw[region[j]] + b_v_prev_raw*v_prev[j];
+    b_state_hat[j] <- b_region_raw[region[j]] + b_foreignpct_raw*foreignpct[j];
 }
 model {
   mu ~ normal (0, 100);
@@ -86,7 +86,7 @@ model {
   b_state_raw ~ normal(b_state_hat, sigma_state_raw);
   beta ~ normal(0, 100);
 
-  b_v_prev_raw ~ normal(0, 100);
+  b_foreignpct_raw ~ normal(0, 100);
   b_region_raw ~ normal(0, sigma_region_raw);
 
   y ~ bernoulli_logit(Xbeta);

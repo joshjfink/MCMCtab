@@ -45,8 +45,8 @@ dataList.2 <- list(N=n, n_age=n.age,n_edu=n.edu,n_state=n.state,
                    v_prev=v.prev,age_edu=age.edu.ok)
 
 str(dataList.2)
-election88_expansion.sf1 <- stan(file='election88_expansion.stan',
-                                 data=dataList.2, iter=1000, chains=4)
+election88_expansion.sf1 <- stan(file='election88_expansion.stan', data=dataList.2, iter=1000, chains=4)
+
 print(election88_expansion.sf1, pars = c("beta","b_age", "b_edu","b_state","b_region","b_age_edu", "lp__"))
 
 
