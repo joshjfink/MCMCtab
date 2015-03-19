@@ -37,8 +37,6 @@ transformed parameters {
   vector[n_cntry] b_cntry_hat;
   real mu_adj;
   vector[N] Xbeta;
-  vector[N] p;
-  vector[N] p_bound;
 
   for (i in 1:N)
     Xbeta[i] <- beta[1] + beta[2]*female[i] +
@@ -52,7 +50,7 @@ transformed parameters {
 
 # Currently no intercept here
   for (j in 1:n_cntry)
-    b_cntry_hat[j] <-  100 * b_foreignpct * foreignpct[j]; 
+    b_cntry[j] <-  b_region[region[j]] 100 * b_foreignpct * foreignpct[j]; 
 }
 model {
   mu_age ~ normal(0, 1);

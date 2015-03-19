@@ -16,7 +16,7 @@ sampdat <- dplyr::filter(cdata, rownames(cdata) %in% sample (rownames(cdata), n/
   mutate(y = dspendlaw) %>% 
   arrange(cntry)
 
-foreignpct_l2 <- dplyr::summarise(group_by(sampdat, cntry), mean(foreignpct))[,2]
+foreignpct_l2 <- foreignpct
 
 # Generate list data for Stan
 attach(sampdat)
@@ -35,18 +35,4 @@ str(stock_dat1)
 stock_m1_comp <- stan(file='Redundant_stock.stan', data = stock_dat1, chains = 0)
 
 Expansion_stock.sf1 <- stan(file='Redundant_stock.stan', data=stock_dat1, iter=400, chains=2)
-
-CL = makeCluster(3, outfile = 'parallel.log')
-clusterExport(cl = CL, c("stock_dat1", "stock_m1_comp")) 
-sflist <- mclapply(1:2, mc.cores = 3, function(i)  stan(fit = stock_m1_comp, data=stock_dat1, chains=1, iter=1000,chain_id = i, seed=34))
-
-fit <- sflist2stanfit(sflist)
-
-print(Expansion_stock.sf1, pars = c("b", "a", "lp__"))
-
-# Expansion_stock.sf1 <- stan(file='Expansion_stock.stan', data=stock_dat1, iter=400, chains=2)
-
-
-
-
 
