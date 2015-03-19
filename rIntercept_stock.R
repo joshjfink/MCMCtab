@@ -39,8 +39,10 @@ RIntercept_stock.sf1 <- mclapply(1:2, mc.cores = 3, function(i)  stan(file='rInt
 stopCluster(CL)
 fit <- sflist2stanfit(RIntercept_stock.sf1)
 
+# Print Results 
 print(fit,  pars = "b")
 
+# print Tracelpots
 pdf("Plots/rIntercept_trace.pdf")
 t <- rstan::traceplot(fit,  pars = c("b", "a"))
 dev.off()
