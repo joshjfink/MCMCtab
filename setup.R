@@ -5,5 +5,5 @@
   detachAllData( ); rm(list=ls())
 
 # Load in Trail Data and Print Parameters 
-load("/Universe/GitHub/PoliceImm_ModelsData/Data/MODsm06data.RData")
+load("/Universe/GitHub/MCMCtab/Local_Only/Testing_Models/MODsm06data.RData")
 
