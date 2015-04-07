@@ -6,7 +6,7 @@ Date: 2015-04-07
 Author: Joshua Fink
 Maintainer: Joshua Fink <joshua.fink@duke.edu>
 Description: More about what it does (maybe more than one line)
-Imports: xtable,coda
+Imports: xtable,coda,runjags
 License: What license is it under?
 LazyData: TRUE
 
