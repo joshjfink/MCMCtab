@@ -22,7 +22,7 @@ sub_sims <- function(sims, params, program,...){
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-latex_t <- function(sims, prob, method, bounds, params, program,...){
-	print(xtable(intervals(sims, prob, method, bounds), comment=FALSE))
+latex_t <- function(sims, ci, method, bounds, params, program,...){
+	print(xtable(intervals(sims, ci, method, bounds), comment=FALSE))
 }
 
