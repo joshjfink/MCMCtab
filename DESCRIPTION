@@ -1,0 +1,12 @@
+Package: MCMCtab
+Type: Package
+Title: Generate HTML/LaTeX Regression Tables for MCMC Ouput
+Version: 0.1
+Date: 2015-04-07
+Author: Joshua Fink
+Maintainer: Joshua Fink <joshua.fink@duke.edu>
+Description: More about what it does (maybe more than one line)
+Imports: xtable,coda
+License: What license is it under?
+LazyData: TRUE
+

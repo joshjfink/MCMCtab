@@ -1,0 +1,4 @@
+import(xtable)
+importFrom(coda, as.mcmc, mcmc, mcmc.list)
+
+exportPattern("^[[:alpha:]]+")
