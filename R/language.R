@@ -6,8 +6,8 @@
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-stan2coda <- function(sims, ...) {
-  return(as.mcmc(mcmc.list(lapply(1:ncol(sims), function(x) mcmc(as.array(sims)[,x,])))))
+stan2coda <- function(fit) {
+     mcmc.list(lapply(1:ncol(fit), function(x) mcmc(as.array(fit)[,x,])))
 }
 
 #' Run transform to coda function based on programming language

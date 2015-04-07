@@ -23,6 +23,7 @@ sub_sims <- function(sims, params, program,...){
 #' add(1, 1)
 #' add(10, 1)
 latex_t <- function(sims, ci, method, bounds, params, program,...){
-	print(xtable(intervals(sims, ci, method, bounds), comment=FALSE))
+  coda_sims <- codatransform
+	# print(xtable(intervals(sims, ci, method, bounds), comment=FALSE))
 }
 

@@ -4,7 +4,7 @@
 \alias{stan2coda}
 \title{Convert STAN output to coda}
 \usage{
-stan2coda(sims, ...)
+stan2coda(fit)
 }
 \arguments{
 \item{x}{A number.}

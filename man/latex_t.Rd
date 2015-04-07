@@ -4,7 +4,7 @@
 \alias{latex_t}
 \title{Generate Table from MCMC Output}
 \usage{
-latex_t(sims, prob, method, bounds, params, program, ...)
+latex_t(sims, ci, method, bounds, params, program, ...)
 }
 \arguments{
 \item{x}{A number.}
