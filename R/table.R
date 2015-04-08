@@ -10,7 +10,7 @@ sub_sims <- function(sims, params, program,...){
 	# Transform to MCMC object
 	c_sims <- codatransform(sims, program,...)
 	# Subset based on parameters of interest
-	return(c_sims[,params])
+	return(as.mcmc(c_sims[,params]))
 }
 
 
@@ -22,8 +22,8 @@ sub_sims <- function(sims, params, program,...){
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-latex_t <- function(sims, ci, method, bounds, params, program,...){
-  coda_sims <- codatransform
-	# print(xtable(intervals(sims, ci, method, bounds), comment=FALSE))
+latex_t <- function(sims, ci, ci_method="hpd", bounds, params, program,...){
+  coda_sims <- sub_sims(sims, params, program,...)
+	print(xtable(intervals(coda_sims, ci, ci_method, bounds), comment=FALSE))
 }
 

@@ -4,7 +4,7 @@
 \alias{intervals}
 \title{Posterior Intervals}
 \usage{
-intervals(sims, ci, method, ...)
+intervals(sims, ci, ci_method, ...)
 }
 \arguments{
 \item{x}{A number.}

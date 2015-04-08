@@ -6,11 +6,11 @@
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-intervals <- function(sims, ci, method, ...) {
-	if(method=="hpd"){
+intervals <- function(sims, ci, ci_method="hpd", ...) {
+	if(ci_method=="hpd"){
 		HPDinterval(sims, ci)
 	}
-	else if(method=="quantile"){
+	else if(ci_method=="quantile"){
 		bounds <- c((1-ci)/2, (.5-ci/2))
 		t(apply(sims,2,quantile,bounds[1], bounds[2]))
 	}

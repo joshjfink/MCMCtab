@@ -1,5 +1,6 @@
 import(xtable)
-importFrom(coda, as.mcmc, mcmc, mcmc.list)
+importFrom(coda, as.mcmc, mcmc, mcmc.list, HPDinterval)
 importFrom(runjags, combine.mcmc)
+
 
 exportPattern("^[[:alpha:]]+")
