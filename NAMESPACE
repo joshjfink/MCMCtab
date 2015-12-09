@@ -1,6 +1,7 @@
-import(xtable)
+# import(xtable)
+import(stargazer)
 importFrom(coda, as.mcmc, mcmc, mcmc.list, HPDinterval)
-importFrom(runjags, combine.mcmc)
+# importFrom(runjags, combine.mcmc)
 
 
 exportPattern("^[[:alpha:]]+")
