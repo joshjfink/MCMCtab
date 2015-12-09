@@ -1,6 +1,5 @@
-*~
-*.Rproj.user
-*.Rhistory
-*.RData
-*.gitignore
-*.DS_Store
+.Rproj.user
+.Rhistory
+.RData
+.gitignore
+.DS_Store
