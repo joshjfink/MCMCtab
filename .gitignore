@@ -19,6 +19,9 @@
 .Rproj.user/
 
 *.Rproj
+*.aux
+*.log
+*.tex
 
 # produced vignettes
 vignettes/*.html
