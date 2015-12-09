@@ -31,3 +31,4 @@ vignettes/*.pdf
 .httr-oauth
 
 *.DS_Store
+.Rproj.user
