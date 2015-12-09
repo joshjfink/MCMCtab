@@ -1,5 +1,28 @@
-.Rproj.user
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
+# History files
 .Rhistory
+.Rapp.history
+
+# Session Data files
 .RData
-.gitignore
+
+# Example code in package build process
+*-Ex.R
+
+# RStudio files
+.Rproj
+
+# produced vignettes
+vignettes/*.html
+vignettes/*.pdf
+
+# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
+.httr-oauth
+
 .DS_Store
