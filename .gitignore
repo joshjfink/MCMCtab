@@ -16,7 +16,8 @@
 *-Ex.R
 
 # RStudio files
-.Rproj
+.Rproj.user/
+
 
 # produced vignettes
 vignettes/*.html
