@@ -6,14 +6,15 @@
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-intervals <- function(sims, ci, ci_method="hpd", ...) {
-	if(ci_method=="hpd"){
-		HPDinterval(sims, ci)
-	}
-	else if(ci_method=="quantile"){
-		bounds <- c((1-ci)/2, (.5-ci/2))
-		t(apply(sims,2,quantile,bounds[1], bounds[2]))
-	}
+intervals <- function(sims, alpha=.9, ci_method="hpd", digits=3,...) {
+  ints <- if(ci_method=="hpd"){
+    HPDinterval(sims, alpha)
+  }
+  else if(ci_method=="quantile"){
+    bounds <- c((1-alpha)/2, (.5-alpha/2))
+    t(apply(sims,2,quantile,bounds[1], bounds[2]))
+  }
+  return(ints)
 }
 
 #' Posterior Mean, Median, Mode
@@ -24,9 +25,10 @@ intervals <- function(sims, ci, ci_method="hpd", ...) {
 #' @examples
 #' add(1, 1)
 #' add(10, 1)
-central <- function(central, ...) {
-		if(central == "mean") t(apply(sims,2,mean))
-	}
+central <- function(sims, measure="mean", ...) {
+  if(measure == "mean") t(apply(sims,2,mean))
+}
+
 
 ####
 # Effective Sample Size (effectiveSize is coda package)
