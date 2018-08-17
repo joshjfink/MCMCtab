@@ -1,5 +1,7 @@
 # MCMCtab
 
+## NOTE: This package is still in development and not ready for use
+
 ## Overview
 
 Generate HTML/LaTeX Publication Style Regression Tables for MCMC Output
